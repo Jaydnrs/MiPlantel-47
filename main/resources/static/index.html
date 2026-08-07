@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MiPlantel 47 — CBTIS 47</title>
+<style>
+  :root {
+    --vino: #6e1f39;
+    --vino-oscuro: #501429;
+    --dorado: #c9a05e;
+    --dorado-suave: #e3caa0;
+    --verde: #2f6b52;
+    --verde-oscuro: #234f3d;
+    --papel: #f7f5f0;
+    --tarjeta: #ffffff;
+    --linea: #e3ddcf;
+    --texto: #2b2b2b;
+    --texto-suave: #7a746a;
+
+    --color-salon: #6fa8d6;
+    --color-laboratorio: #7fbf8e;
+    --color-computo: #b98fd0;
+    --color-oficina: #d6a05a;
+    --color-hover: #ffe08a;
+    --color-seleccion: #6e1f39;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--papel);
+    color: var(--texto);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .encabezado { display: flex; }
+
+  .pestana {
+    padding: 0.85rem 1.4rem;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.02em;
+    color: #fff;
+  }
+
+  .pestana.activa { background: var(--vino); }
+  .pestana.secundaria { background: var(--dorado); color: var(--vino-oscuro); flex: 1; text-align: center; }
+
+  .barra-busqueda {
+    background: var(--tarjeta);
+    border-bottom: 1px solid var(--linea);
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  .barra-busqueda .grupo {
+    width: 100%;
+    max-width: 620px;
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+
+  .barra-busqueda select {
+    flex: 1;
+    min-width: 170px;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--linea);
+    border-radius: 4px;
+    font-size: 0.9rem;
+    background: #fdfcf9;
+    color: var(--texto);
+    transition: border-color 0.15s ease;
+  }
+
+  .barra-busqueda select:focus { outline: none; border-color: var(--vino); }
+
+  main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 1.6rem;
+    gap: 1.4rem;
+    flex-wrap: wrap;
+  }
+
+  .contenedor-mapa {
+    width: 100%;
+    max-width: 560px;
+    background: var(--tarjeta);
+    border: 1px solid var(--linea);
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+
+  .titulo-mapa {
+    padding: 0.7rem 1.1rem;
+    background: var(--verde);
+    color: #fff;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 0.02em;
+  }
+
+  /* Contenedor svg */
+  #contenedor-svg { padding: 8px; }
+  #contenedor-svg svg { display: block; width: 100%; height: auto; }
+
+  #contenedor-svg .mensaje-carga {
+    padding: 2rem 1rem;
+    text-align: center;
+    color: var(--texto-suave);
+    font-size: 0.88rem;
+  }
+
+  /* Clases para las formas del svg */
+  .casilla {
+    stroke: #ffffff;
+    stroke-width: 2;
+    cursor: pointer;
+    transition: fill 0.15s ease, transform 0.15s ease;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  .casilla.tipo-salon { fill: var(--color-salon); }
+  .casilla.tipo-laboratorio { fill: var(--color-laboratorio); }
+  .casilla.tipo-computo { fill: var(--color-computo); }
+  .casilla.tipo-oficina { fill: var(--color-oficina); }
+
+  .casilla:hover { fill: var(--color-hover); transform: scale(1.04); }
+  .casilla.seleccionado { stroke: var(--color-seleccion); stroke-width: 4; fill: var(--color-seleccion); }
+
+  .etiqueta { font-size: 12px; fill: #24313c; pointer-events: none; font-weight: 600; }
+
+  .panel-info {
+    width: 100%;
+    max-width: 320px;
+    background: var(--tarjeta);
+    border: 1px solid var(--linea);
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+
+  .panel-info .titulo-panel {
+    padding: 0.7rem 1.1rem;
+    background: var(--vino);
+    color: #fff;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 0.02em;
+  }
+
+  .panel-info .cuerpo-panel { padding: 1rem 1.1rem; min-height: 160px; }
+
+  .panel-info .fila {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.6rem;
+    font-size: 0.88rem;
+    padding: 0.45rem 0;
+    border-bottom: 1px dashed var(--linea);
+  }
+
+  .panel-info .fila span:first-child { color: var(--texto-suave); }
+  .panel-info .fila span:last-child { font-weight: 600; text-align: right; }
+
+  .panel-info .vacio {
+    color: var(--texto-suave);
+    font-size: 0.88rem;
+    text-align: center;
+    padding: 1.5rem 0.5rem;
+  }
+
+  @keyframes entrarPanel {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .cuerpo-panel.anim { animation: entrarPanel 0.22s ease-out; }
+
+  footer { text-align: center; padding: 0.8rem; font-size: 0.75rem; color: var(--texto-suave); }
+</style>
+</head>
+<body>
+
+  <div class="encabezado">
+    <div class="pestana activa">MiPlantel 47</div>
+    <div class="pestana secundaria">CBTIS 47 — Mapa del plantel</div>
+  </div>
+
+  <div class="barra-busqueda">
+    <div class="grupo">
+      <select id="select-tipo">
+        <option value="">Selecciona un tipo...</option>
+        <option value="salon">Salón</option>
+        <option value="laboratorio">Laboratorio</option>
+        <option value="computo">Laboratorio de cómputo</option>
+        <option value="oficina">Oficina</option>
+      </select>
+      <select id="select-espacio" disabled>
+        <option value="">Selecciona un tipo primero</option>
+      </select>
+    </div>
+  </div>
+
+  <main>
+    <div class="contenedor-mapa">
+      <div class="titulo-mapa">Mapa del plantel</div>
+      <!-- Aquí se inyecta el SVG cargado desde archivo externo -->
+      <div id="contenedor-svg">
+        <p class="mensaje-carga">Cargando mapa...</p>
+      </div>
+    </div>
+
+    <div class="panel-info">
+      <div class="titulo-panel">Información</div>
+      <div class="cuerpo-panel" id="cuerpo-panel">
+        <p class="vacio">Selecciona un espacio en el mapa para ver su información.</p>
+      </div>
+    </div>
+  </main>
+
+  <footer>MiPlantel 47 — Proyecto de ingeniería, CBTIS 47</footer>
+
+<script>
+    
+const RUTA_SVG = "assets/dibujo.svg";
+
+/*    2. DATOS DE LOS ESPACIOS
+    guía para no olvidarme de los campos
+   Campos según el tipo (dentro de "datos"):
+     salon:       { numero, sillas, ocupado }
+     laboratorio: { subtipo (Química/Física), asientos, materialCompleto, ocupado }
+     computo:     { numero, computadoras, ocupado }
+     oficina:     { nombre, funcion, horario } */
+const ESPACIOS = [
+  // salones
+  { id: "22", tipo: "salon",
+    datos: { numero: "22", sillas: 40, ocupado: false } },
+
+  { id: "23", tipo: "salon",
+    datos: { numero: "23", sillas: 38, ocupado: true } },
+
+  { id: "S103", tipo: "salon",
+    datos: { numero: "103", sillas: 42, ocupado: false } },
+
+  //  laboratorios 
+  { id: "L201", tipo: "laboratorio",
+    datos: { subtipo: "Química", asientos: 30, materialCompleto: true, ocupado: false } },
+
+  { id: "L202", tipo: "laboratorio",
+    datos: { subtipo: "Física", asientos: 28, materialCompleto: false, ocupado: false } },
+
+  { id: "L203", tipo: "laboratorio",
+    datos: { subtipo: "Química", asientos: 32, materialCompleto: true, ocupado: true } },
+
+  // oficinas
+  { id: "O401", tipo: "oficina",
+    datos: { nombre: "Servicios Escolares", funcion: "Trámites de boletas y documentos", horario: "8:00 - 15:00" } },
+
+  { id: "O402", tipo: "oficina",
+    datos: { nombre: "Dirección", funcion: "Administración general del plantel", horario: "8:00 - 14:00" } },
+
+  { id: "O403", tipo: "oficina",
+    datos: { nombre: "Control Escolar", funcion: "Inscripciones y constancias", horario: "8:00 - 15:30" } },
+];
+
+const NOMBRE_TIPO = {
+  salon: "Salón",
+  laboratorio: "Laboratorio",
+  computo: "Laboratorio de cómputo",
+  oficina: "Oficina",
+};
+
+
+const contenedorSvg = document.getElementById("contenedor-svg");
+
+function cargarMapa() {
+  if (!RUTA_SVG) {
+    contenedorSvg.innerHTML =
+      `<p class="mensaje-carga">Configura RUTA_SVG en el código para cargar el mapa.</p>`;
+    return;
+  }
+
+  fetch(RUTA_SVG)
+    .then(respuesta => {
+      if (!respuesta.ok) throw new Error("No se pudo cargar el archivo SVG");
+      return respuesta.text();
+    })
+    .then(svgTexto => {
+      contenedorSvg.innerHTML = svgTexto;
+      engancharEventos();
+    })
+    .catch(error => {
+      contenedorSvg.innerHTML =
+        `<p class="mensaje-carga">Error al cargar el mapa: ${error.message}</p>`;
+    });
+}
+
+/* Conecta el click de cada forma del SVG con la selección de espacio.
+   No importa si la forma es <rect>, <path> o <polygon> — solo necesita
+   la clase "casilla" y el atributo data-id. */
+function engancharEventos() {
+  contenedorSvg.querySelectorAll(".casilla").forEach(forma => {
+    const id = forma.dataset.id;
+    forma.addEventListener("click", () => seleccionarEspacio(id));
+  });
+}
+
+/* PANEL DE INFORMACIÓN */
+const cuerpoPanel = document.getElementById("cuerpo-panel");
+
+function construirFilasInfo(espacio) {
+  const d = espacio.datos;
+  switch (espacio.tipo) {
+    case "salon":
+      return [
+        ["Número", d.numero],
+        ["Número de sillas", d.sillas],
+        ["Ocupado", d.ocupado ? "Sí" : "No"],
+      ];
+    case "laboratorio":
+      return [
+        ["Tipo", d.subtipo],
+        ["Número de asientos", d.asientos],
+        ["Material completo", d.materialCompleto ? "Sí" : "No"],
+        ["Ocupado", d.ocupado ? "Sí" : "No"],
+      ];
+    case "computo":
+      return [
+        ["Número", d.numero],
+        ["Número de computadoras", d.computadoras],
+        ["Ocupado", d.ocupado ? "Sí" : "No"],
+      ];
+    case "oficina":
+      return [
+        ["Nombre", d.nombre],
+        ["Función", d.funcion],
+        ["Horario", d.horario],
+      ];
+    default:
+      return [];
+  }
+}
+
+function mostrarInfo(id) {
+  const espacio = ESPACIOS.find(e => e.id === id);
+  if (!espacio) return;
+
+  const filas = construirFilasInfo(espacio);
+  cuerpoPanel.innerHTML =
+    `<div class="fila"><span>${NOMBRE_TIPO[espacio.tipo]}</span><span>${id}</span></div>` +
+    filas.map(([etiqueta, valor]) =>
+      `<div class="fila"><span>${etiqueta}</span><span>${valor}</span></div>`
+    ).join("");
+
+  cuerpoPanel.classList.remove("anim");
+  void cuerpoPanel.offsetWidth;
+  cuerpoPanel.classList.add("anim");
+}
+
+/* seleccion de salon
+function seleccionarEspacio(id) {
+  contenedorSvg.querySelectorAll(".casilla.seleccionado")
+    .forEach(el => el.classList.remove("seleccionado"));
+
+  const forma = contenedorSvg.querySelector(`[data-id="${id}"]`);
+  if (forma) forma.classList.add("seleccionado");
+
+  mostrarInfo(id);
+}
+
+// buscador
+const selectTipo = document.getElementById("select-tipo");
+const selectEspacio = document.getElementById("select-espacio");
+
+selectTipo.addEventListener("change", () => {
+  const tipo = selectTipo.value;
+
+  if (!tipo) {
+    selectEspacio.disabled = true;
+    selectEspacio.innerHTML = `<option value="">Selecciona un tipo primero</option>`;
+    return;
+  }
+
+  const coincidencias = ESPACIOS.filter(e => e.tipo === tipo);
+  selectEspacio.disabled = false;
+  selectEspacio.innerHTML = `<option value="">Selecciona un espacio...</option>` +
+    coincidencias.map(e => `<option value="${e.id}">${e.id}</option>`).join("");
+});
+
+selectEspacio.addEventListener("change", () => {
+  if (selectEspacio.value) seleccionarEspacio(selectEspacio.value);
+});
+
+// arranque
+cargarMapa();
+</script>
+
+</body>
+</html>

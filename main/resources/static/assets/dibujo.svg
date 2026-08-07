@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="400mm"
+   height="400mm"
+   viewBox="0 0 400 400"
+   version="1.1"
+   id="svg1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <g
+     id="layer1">
+    <rect
+       
+       id="22"
+       width="62.627445"
+       height="52.607056"
+       x="36.095932"
+       y="93.606209"
+       data-id="22"
+       class="casilla tipo-salon" />
+    <rect
+       style="fill:#000000;fill-opacity:0;stroke:#000000;stroke-width:0.965;stroke-dasharray:none;stroke-opacity:1"
+       id="23"
+       width="62.627445"
+       height="52.607056"
+       x="129.06999"
+       y="107.63875"
+       data-id="23"
+       class="casilla tipo-salon" />
+    <rect
+       style="fill:#000000;fill-opacity:0;stroke:#000000;stroke-width:0.965;stroke-dasharray:none;stroke-opacity:1"
+       id="2"
+       width="62.627445"
+       height="52.607056"
+       x="73.507492"
+       y="196.53874"
+       data-id="2"
+       class="casilla tipo-oficina" />
+    <rect
+       style="fill:#000000;fill-opacity:0;stroke:#000000;stroke-width:0.965;stroke-dasharray:none;stroke-opacity:1"
+       id="1"
+       width="62.627445"
+       height="52.607056"
+       x="198.39084"
+       y="124.04292"
+       data-id="1"
+       class="casilla tipo-oficina" />
+  </g>
+</svg>
